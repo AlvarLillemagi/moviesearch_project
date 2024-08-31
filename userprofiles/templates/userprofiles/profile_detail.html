@@ -1,0 +1,20 @@
+{% extends 'moviesearch/base.html' %}
+
+{% block title %}Profile Details{% endblock %}
+
+{% block content %}
+<h1>{{ user.username }}</h1>
+<div class="profile-info">
+    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Biography:</strong> {{ user.profile.biography }}</p>
+    <p><strong>Date of Birth:</strong> {{ user.profile.date_of_birth }}</p>
+    {% if user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" style="width: 150px; height: 150px;">
+    {% else %}
+        <p><strong>Profile Picture:</strong> No profile picture available.</p>
+    {% endif %}
+</div>
+<a href="{% url 'profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+{% endblock %}

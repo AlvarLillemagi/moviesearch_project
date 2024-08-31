@@ -1,0 +1,28 @@
+{% extends 'moviesearch/base.html' %}
+
+{% load static %}
+
+{% block title %}Bookmarked Movies{% endblock %}
+
+{% block content %}
+    <h1>Your Bookmarked Movies</h1>
+    {% if bookmarked_movies %}
+        <div class="movie-grid">
+            {% for movie in bookmarked_movies %}
+                <div class="movie-card">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}">
+                        {% if movie.poster_path %}
+                            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                        {% else %}
+                            <img src="{% static 'no_image_available.png' %}" alt="No Image Available">
+                        {% endif %}
+                        <h2>{{ movie.title }}</h2>
+                        <p>Release Date: {{ movie.release_date }}</p>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You have no bookmarked movies yet.</p>
+    {% endif %}
+{% endblock %}

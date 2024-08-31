@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ movie.title }} Details{% endblock %}
+
+{% block content %}
+    <div class="movie-detail">
+        {% if movie.poster_path %}
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+        {% else %}
+            <img src="{% static 'no_image_available.png' %}" alt="No Image Available">
+        {% endif %}
+        <div class="movie-info">
+            <h1>{{ movie.title }}</h1>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+            <p><strong>Rating:</strong> {{ movie.vote_average }} / 10</p>
+            <p><strong>Overview:</strong> {{ movie.overview }}</p>
+            
+            {% if is_bookmarked %}
+                <form method="post" action="{% url 'remove_bookmark' movie.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove Bookmark</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'add_bookmark' movie.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Add Bookmark</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
