@@ -7,16 +7,12 @@
 <form method="post" enctype="multipart/form-data" class="profile-form">
     {% csrf_token %}
     <div class="form-group">
-        {{ form.first_name.label_tag }}
-        {{ form.first_name }}
+        <label for="id_first_name">First Name:</label>
+        <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name }}" class="form-control">
     </div>
     <div class="form-group">
-        {{ form.last_name.label_tag }}
-        {{ form.last_name }}
-    </div>
-    <div class="form-group">
-        {{ form.email.label_tag }}
-        {{ form.email }}
+        <label for="id_last_name">Last Name:</label>
+        <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name }}" class="form-control">
     </div>
     <div class="form-group">
         {{ form.biography.label_tag }}

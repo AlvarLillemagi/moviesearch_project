@@ -8,10 +8,10 @@
     <p><strong>First Name:</strong> {{ user.first_name }}</p>
     <p><strong>Last Name:</strong> {{ user.last_name }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Biography:</strong> {{ user.profile.biography }}</p>
-    <p><strong>Date of Birth:</strong> {{ user.profile.date_of_birth }}</p>
-    {% if user.profile.profile_picture %}
-        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" style="width: 150px; height: 150px;">
+    <p><strong>Biography:</strong> {{ profile.biography }}</p>
+    <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" style="width: 150px; height: 150px;">
     {% else %}
         <p><strong>Profile Picture:</strong> No profile picture available.</p>
     {% endif %}
