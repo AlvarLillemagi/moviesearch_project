@@ -31,7 +31,7 @@ def search_movies(request):
         'movies': movies,
         'query': query
     }
-    return render(request, 'moviesearch/search_results.html', {'movies': movies})
+    return render(request, 'moviesearch/search_results.html', context)
 
 def movie_detail(request, tmdb_id):
     url = f'https://api.themoviedb.org/3/movie/{tmdb_id}'
@@ -42,23 +42,34 @@ def movie_detail(request, tmdb_id):
     response = requests.get(url, params=params)
     if response.status_code == 200:
         movie = response.json()
-        is_bookmarked = Movie.objects.filter(tmdb_id=tmdb_id).exists()
+        is_bookmarked = Bookmark.objects.filter(user=request.user, movie__tmdb_id=tmdb_id).exists()
 
         if request.method == 'POST':
             if 'add_bookmark' in request.POST:
+                movie_obj, created = Movie.objects.get_or_create(
+                    tmdb_id=tmdb_id,
+                    defaults={
+                        'title': movie['title'],
+                        'overview': movie['overview'],
+                        'release_date': movie['release_date'],
+                        'poster_path': movie['poster_path']
+                    }
+                )
                 if not is_bookmarked:
-                    Movie.objects.create(tmdb_id=tmdb_id, title=movie['title'])
+                    Bookmark.objects.create(user=request.user, movie=movie_obj)
                     messages.success(request, 'Movie added to bookmarks.')
                 else:
                     messages.info(request, 'Movie is already bookmarked.')
+
                 return redirect('movie_detail', tmdb_id=tmdb_id)
 
             elif 'remove_bookmark' in request.POST:
                 if is_bookmarked:
-                    Movie.objects.filter(tmdb_id=tmdb_id).delete()
+                    Bookmark.objects.filter(user=request.user, movie__tmdb_id=tmdb_id).delete()
                     messages.success(request, 'Movie removed from bookmarks.')
                 else:
                     messages.info(request, 'Movie was not bookmarked.')
+
                 return redirect('movie_detail', tmdb_id=tmdb_id)
 
         context = {
@@ -109,9 +120,11 @@ def remove_bookmark(request, tmdb_id):
 
 @login_required
 def bookmarks(request):
-    bookmarked_ids = Bookmark.objects.filter(user=request.user).values_list('movie_id', flat=True)
-    bookmarked_movies = Movie.objects.filter(tmdb_id__in=bookmarked_ids)
-    return render(request, 'moviesearch/bookmarks.html', {'bookmarked_movies': bookmarked_movies})
+    bookmarked_movies = Bookmark.objects.filter(user=request.user).select_related('movie')
+    context = {
+        'bookmarked_movies': [bookmark.movie for bookmark in bookmarked_movies]
+    }
+    return render(request, 'moviesearch/bookmarks.html', context)
 
 @login_required
 def profile_detail(request):
@@ -120,14 +133,15 @@ def profile_detail(request):
         user.first_name = request.POST.get('first_name', user.first_name)
         user.last_name = request.POST.get('last_name', user.last_name)
         user.email = request.POST.get('email', user.email)
-        user.profile.biography = request.POST.get('biography', user.profile.biography)
-        user.profile.date_of_birth = request.POST.get('date_of_birth', user.profile.date_of_birth)
 
-        if 'profile_picture' in request.FILES:
-            user.profile.profile_picture = request.FILES['profile_picture']
-
+        if hasattr(user, 'profile'):
+            user.profile.biography = request.POST.get('biography', user.profile.biography)
+            user.profile.date_of_birth = request.POST.get('date_of_birth', user.profile.date_of_birth)
+            if 'profile_picture' in request.FILES:
+                user.profile.profile_picture = request.FILES['profile_picture']
+            user.profile.save()
         user.save()
-        user.profile.save()
+
         messages.success(request, 'Your profile has been updated.')
         return redirect('profile_detail')
 

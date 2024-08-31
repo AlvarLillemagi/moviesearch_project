@@ -10,15 +10,19 @@
         <div class="movie-grid">
             {% for movie in bookmarked_movies %}
                 <div class="movie-card">
-                    <a href="{% url 'movie_detail' movie.tmdb_id %}">
-                        {% if movie.poster_path %}
-                            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
-                        {% else %}
-                            <img src="{% static 'no_image_available.png' %}" alt="No Image Available">
-                        {% endif %}
-                        <h2>{{ movie.title }}</h2>
-                        <p>Release Date: {{ movie.release_date }}</p>
-                    </a>
+                    {% if movie.tmdb_id %}
+                        <a href="{% url 'movie_detail' movie.tmdb_id %}">
+                            {% if movie.poster_path %}
+                                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                            {% else %}
+                                <img src="{% static 'no_image_available.png' %}" alt="No Image Available">
+                            {% endif %}
+                            <h2>{{ movie.title }}</h2>
+                            <p>Release Date: {{ movie.release_date }}</p>
+                        </a>
+                    {% else %}
+                        <p>Movie details are missing.</p>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
